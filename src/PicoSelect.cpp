@@ -8,14 +8,14 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
   _quickKeys(false)
 {
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
-     printf("Select key pressed %d %d %d %c\n", keycode, modifiers, ascii, ascii);
+    // printf("Select key pressed %d %d %d %c\n", keycode, modifiers, ascii, ascii);
     // up    82 
     // down  81
     if (_quickKeys) {
       for (int i = 0; i < optionCount(); ++ i) {
         PicoOption * option = _options[i];
         if (option->isQuickKey(keycode, modifiers, ascii)) {
-          printf("Toggling %d %d %d %c\n", keycode, modifiers, ascii, ascii);
+          // printf("Toggling %d %d %d %c\n", keycode, modifiers, ascii, ascii);
           _i = i;
           toggleSelection(option);
           return false;
@@ -53,7 +53,6 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
     const int32_t s0 = _i - (_r >> 1);  
     const int32_t s1 = optionCount() - _r;
     const int32_t s = s0 <= 0 || s1 <= 0 ? 0 : (s0 > s1 ? s1 : s0);
-    printf("s0 = %ld, s = %ld\n", s0, s);
     int32_t y = 0;
     for(int32_t r = 0; r < _r; ++r) {
       const int32_t i = r + s;
