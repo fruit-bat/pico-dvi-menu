@@ -11,6 +11,8 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
     // printf("Select key pressed %d %d %d %c\n", keycode, modifiers, ascii, ascii);
     // up    82 
     // down  81
+    // left  80 
+    // right 79
     if (_quickKeys) {
       for (int i = 0; i < optionCount(); ++ i) {
         PicoOption * option = _options[i];
@@ -27,6 +29,20 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
       case 32: case 13: {
         if (_i >= 0 && _i < optionCount()) {
           toggleSelection(_options[_i]);
+        }
+        return false;
+      }
+      case 129: {
+        if (_i > _r) { 
+          _i -= _r;
+          repaint();
+        }
+        return false;
+      }
+      case 128: {
+        if (_i + _r < optionCount()) {
+          _i += r;
+          repaint();
         }
         return false;
       }
@@ -101,9 +117,13 @@ void PicoSelect::toggleSelection(PicoOption *option) {
 }
 
 void PicoSelect::focus(int32_t i) {
-  if (i >= 0 && i < optionCount() && i != _i) {
+  if (_i == i) return;
+  if (i >= 0) {
     _i = i;
-    repaint();
+    if (i >= optionCount()) {
+      i = optionCount() - 1;
+    }
   }
+  repaint();
 }
 
