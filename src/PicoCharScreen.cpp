@@ -1,5 +1,4 @@
 #include "PicoCharScreen.h"
-#include <memory.h>
 
 PicoCharScreen::PicoCharScreen(uint16_t *chars, uint32_t w, uint32_t h) :
   _chars(chars),
