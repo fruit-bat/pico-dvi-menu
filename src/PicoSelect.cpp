@@ -1,6 +1,6 @@
 #include "PicoSelect.h"
 #include "PicoPen.h"
-#include <pico/printf.h>
+// #include <pico/printf.h>
 
 PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
   PicoWin(x, y, w, r * rh),

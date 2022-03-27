@@ -1,5 +1,4 @@
 #pragma once
-#include <pico/printf.h>
 #include "PicoRectXYWH.h"
 
 class PicoCharScreen {

@@ -6,8 +6,6 @@ PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) 
   _maxchars(maxchars)
 {
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
-    printf("Text field key pressed %d %d %d %c\n", keycode, modifiers, ascii, ascii);
-    
     switch(ascii) {
       case 2: { // Home
         if (_cursor > 0) {
