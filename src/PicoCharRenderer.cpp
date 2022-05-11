@@ -8,7 +8,7 @@ extern "C" {
 #include "tmds_encode.h"
 }
 
-static uint16_t charScreen[PCS_COLS * PCS_ROWS];
+__attribute__((aligned(4))) static uint16_t charScreen[PCS_COLS * PCS_ROWS];
 static uint8_t charFont[256 * 8];
 static PicoCharScreen picoCharScreen(charScreen, PCS_COLS, PCS_ROWS);
 

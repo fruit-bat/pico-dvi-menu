@@ -1,5 +1,5 @@
-add_library(pico_dvi_menu INTERFACE)
-target_sources(pico_dvi_menu INTERFACE
+
+set(pico_menu_common
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoRectXYWH.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoRectXYXY.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharScreen.cpp
@@ -16,8 +16,26 @@ target_sources(pico_dvi_menu INTERFACE
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoQuickKeyAscii.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoWiz.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoTextField.cpp
+)
+
+add_library(pico_dvi_menu INTERFACE)
+
+target_sources(pico_dvi_menu INTERFACE
+	${pico_menu_common}
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharRenderer.cpp
 )
+
 target_include_directories(pico_dvi_menu INTERFACE
+    src
+)
+
+add_library(pico_vga_menu INTERFACE)
+
+target_sources(pico_vga_menu INTERFACE
+	${pico_menu_common}
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharRendererVga.cpp
+)
+
+target_include_directories(pico_vga_menu INTERFACE
     src
 )
