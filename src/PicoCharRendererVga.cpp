@@ -20,14 +20,14 @@ void __not_in_flash_func(pcw_prepare_vga332_scanline_80)(uint32_t* buf, int y, u
     uint16_t z;
     int b;
     z = ((ch >> 8) ^ ((ch >> 9) & m)) & 1; 
-    b = charFont[(ch & 0xff) + __mul_instruction(yb, PCS_COLS)] ^ __mul_instruction(z, 0xff);
-    buf[np++] = nibblebits[b & 0xf];
+    b = charFont[((ch & 0xff) << 3) + yb] ^ __mul_instruction(z, 0xff);
     buf[np++] = nibblebits[b >> 4];
+    buf[np++] = nibblebits[b & 0xf];
     ch = ch >> 16;
     z = ((ch >> 8) ^ ((ch >> 9) & m)) & 1; 
-    b = charFont[(ch & 0xff) + __mul_instruction(yb, PCS_COLS)] ^ __mul_instruction(z, 0xff);
-    buf[np++] = nibblebits[b & 0xf];
+    b = charFont[((ch & 0xff) << 3) + yb] ^ __mul_instruction(z, 0xff);
     buf[np++] = nibblebits[b >> 4];
+    buf[np++] = nibblebits[b & 0xf];
   }
 }
 
@@ -37,10 +37,18 @@ void pcw_init_renderer() {
   for(int i = 0; i < 16; ++i) {
     uint32_t a = 0;
     for(int j = 0; j < 4; ++j) {
-      if (i & (1 << j)) a |= (0xff << (j << 3));
+      if (i & (1 << j)) a |= (0xff << ((3 - j) << 3));
     }
     nibblebits[i] = a;
-  }  
+  }
+  
+  for (int x = 0; x < PCS_COLS; ++x) {
+    for (int y = 0; y < PCS_ROWS; ++y) {
+      int i = x + (y * PCS_COLS);
+      int j = (x & 3) << 8;
+      charScreen[i] = (i & 0x7f) | j;
+    }
+  }
 }
 
 PicoCharScreen *pcw_screen() {
