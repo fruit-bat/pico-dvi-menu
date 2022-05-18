@@ -21,7 +21,7 @@ PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) 
       case 3: { // End
         if (_cursor < textlen()) {
           _cursor = textlen();
-          const int32_t e = (_cursor - _start) - ww();
+          const int32_t e = (_cursor - _start) - ww() + 1;
           if (e > 0) {
             _start += e;
           }
@@ -42,7 +42,7 @@ PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) 
       case 128: { // right
         if (_cursor < textlen()) {
           _cursor++;
-          const int32_t e = (_cursor - _start) - ww();
+          const int32_t e = (_cursor - _start) - ww() + 1;
           if (e > 0) {
             _start += e;
           }
@@ -76,6 +76,10 @@ PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) 
         if (ascii >= 32 && ascii < 127 && textlen() < _maxchars) {
           _text.insert(_cursor, 1, ascii);
           _cursor++;
+          const int32_t e = (_cursor - _start) - ww() + 1;
+          if (e > 0) {
+            _start += e;
+          }
           repaint();
           return false;
         }
