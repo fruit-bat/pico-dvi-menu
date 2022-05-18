@@ -3,9 +3,12 @@
 
 PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) :
   PicoWin(x, y, w, 1),
+  _cursor(0),
+  _start(0),
   _maxchars(maxchars)
 {
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
+
     switch(ascii) {
       case 2: { // Home
         if (_cursor > 0) {
@@ -76,6 +79,7 @@ PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) 
           repaint();
           return false;
         }
+        break;
       }
     };
     

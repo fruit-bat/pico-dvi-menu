@@ -1,6 +1,6 @@
 #pragma once
 #include "PicoWin.h"
-#include <string.h>
+#include <string>
 #include <functional>
 
 class PicoTextField : public PicoWin {
