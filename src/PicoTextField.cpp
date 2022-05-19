@@ -73,14 +73,16 @@ PicoTextField::PicoTextField(int32_t x, int32_t y, int32_t w, int32_t maxchars) 
         return false;
       }
       default: {
-        if (ascii >= 32 && ascii < 127 && textlen() < _maxchars) {
-          _text.insert(_cursor, 1, ascii);
-          _cursor++;
-          const int32_t e = (_cursor - _start) - ww() + 1;
-          if (e > 0) {
-            _start += e;
+        if (ascii >= 32 && ascii < 127) {
+          if (textlen() < _maxchars) {
+            _text.insert(_cursor, 1, ascii);
+            _cursor++;
+            const int32_t e = (_cursor - _start) - ww() + 1;
+            if (e > 0) {
+              _start += e;
+            }
+            repaint();
           }
-          repaint();
           return false;
         }
         break;

@@ -114,7 +114,8 @@ static bool isInReport(hid_keyboard_report_t const *report, const unsigned char 
 }
 
 PicoWinHidKeyboard::PicoWinHidKeyboard(PicoDisplay *display) :
-  _display(display)
+  _display(display),
+  _capslock(false)
 {
 }
 
@@ -143,9 +144,10 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
         else {
           // TODO Turn CAPS light on/off
           if (hidKeyCode == HID_KEY_CAPS_LOCK) _capslock = !_capslock;
-          
           // not existed in previous report means the current key is pressed
-          bool const is_shift =  _capslock || (report->modifier & (KEYBOARD_MODIFIER_LEFTSHIFT | KEYBOARD_MODIFIER_RIGHTSHIFT));
+          bool const is_shift =  
+            (_capslock && (hidKeyCode >= 0x04) && (hidKeyCode <= 0x1d)) || 
+            (report->modifier & (KEYBOARD_MODIFIER_LEFTSHIFT | KEYBOARD_MODIFIER_RIGHTSHIFT));
           uint8_t ch = keycode2ascii[report->keycode[i]][is_shift ? 1 : 0];
           if (keyPressed(hidKeyCode, report->modifier, ch) && (ch == 27)) r = 1;
         }
