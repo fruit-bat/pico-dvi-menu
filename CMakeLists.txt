@@ -26,7 +26,7 @@ target_sources(pico_dvi_menu INTERFACE
 )
 
 target_include_directories(pico_dvi_menu INTERFACE
-    src
+  ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
 add_library(pico_vga_menu INTERFACE)
