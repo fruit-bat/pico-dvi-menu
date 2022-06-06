@@ -39,3 +39,14 @@ target_sources(pico_vga_menu INTERFACE
 target_include_directories(pico_vga_menu INTERFACE
     src
 )
+
+add_library(pico_st7789_menu INTERFACE)
+
+target_sources(pico_st7789_menu INTERFACE
+	${pico_menu_common}
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharRendererSt7789.cpp
+)
+
+target_include_directories(pico_st7789_menu INTERFACE
+    src
+)
