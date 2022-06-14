@@ -88,8 +88,7 @@ void pcw_init_renderer() {
   for (int x = 0; x < PCS_COLS; ++x) {
     for (int y = 0; y < PCS_ROWS; ++y) {
       int i = x + (y * PCS_COLS);
-      int j = (x & 3) << 8;
-      charScreen[i] = (i & 0x7f) | j;
+      charScreen[i] = 3;
     }
   }
 }
