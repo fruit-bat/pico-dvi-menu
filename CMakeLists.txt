@@ -40,6 +40,17 @@ target_include_directories(pico_vga_menu INTERFACE
     src
 )
 
+add_library(pico_vga16_menu INTERFACE)
+
+target_sources(pico_vga16_menu INTERFACE
+	${pico_menu_common}
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharRendererVga16.cpp
+)
+
+target_include_directories(pico_vga16_menu INTERFACE
+    src
+)
+
 add_library(pico_st7789_menu INTERFACE)
 
 target_sources(pico_st7789_menu INTERFACE
