@@ -18,9 +18,15 @@
 
 #include "tusb.h"
 #include "PicoCharScreen.h"
+#include "pico/scanvideo.h"
 
 extern "C" { 
-  void __not_in_flash_func(pcw_prepare_vga16_scanline_80)(uint32_t* buf, int y, uint32_t frames);
+  void __not_in_flash_func(pcw_prepare_scanvideo_scanline_80)(
+    struct scanvideo_scanline_buffer *scanline_buffer, 
+    int y,
+    uint32_t frames
+  );
+  
   void pcw_init_renderer();
 }
 

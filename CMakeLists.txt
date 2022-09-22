@@ -40,14 +40,14 @@ target_include_directories(pico_vga_menu INTERFACE
     src
 )
 
-add_library(pico_vga16_menu INTERFACE)
+add_library(pico_scanvideo_menu INTERFACE)
 
-target_sources(pico_vga16_menu INTERFACE
+target_sources(pico_scanvideo_menu INTERFACE
 	${pico_menu_common}
-	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharRendererVga16.cpp
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoCharRendererScanvideo.cpp
 )
 
-target_include_directories(pico_vga16_menu INTERFACE
+target_include_directories(pico_scanvideo_menu INTERFACE
     src
 )
 
