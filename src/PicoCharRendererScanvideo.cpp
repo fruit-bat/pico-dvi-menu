@@ -9,6 +9,16 @@ static PicoCharScreen picoCharScreen(charScreen, PCS_COLS, PCS_ROWS);
 
 #define VGA_RGB_555(r,g,b) ((r##UL<<0)|(g##UL<<6)|(b##UL << 11))
 
+static uint32_t bgc = 0;
+static uint32_t fgc = VGA_RGB_555(10, 28, 10);
+
+static uint32_t bbcw[4] {
+  bgc | (bgc << 16),
+  bgc | (fgc << 16),
+  fgc | (bgc << 16),
+  fgc | (fgc << 16)
+};
+
 void __not_in_flash_func(pcw_prepare_scanvideo_scanline_80)(
     struct scanvideo_scanline_buffer *scanline_buffer, 
     int y,
@@ -17,9 +27,11 @@ void __not_in_flash_func(pcw_prepare_scanvideo_scanline_80)(
   uint32_t* buf = scanline_buffer->data;
   
   
-  uint32_t cw[2];
-  cw[0] = 0;
-  cw[1] = VGA_RGB_555(10, 28, 10);
+  uint32_t cw[2], cs[2];
+  cw[0] = bgc;
+  cw[1] = fgc;
+  cs[0] = cw[0] << 16;
+  cs[1] = cw[1] << 16;
   
   const uint16_t m = (frames >> 5) & 1;
 
@@ -31,23 +43,22 @@ void __not_in_flash_func(pcw_prepare_scanvideo_scanline_80)(
   for (int x = 0; x < (PCS_COLS >> 1); ++x) {
     uint32_t ch = *cl++;
     uint16_t z = ((ch >> 8) ^ ((ch >> 9) & m)) & 1; 
-    uint32_t p = charFont[((ch & 0xff) << 3) + yb] ^ __mul_instruction(z, 0xff);
+    int p = charFont[((ch & 0xff) << 3) + yb] ^ __mul_instruction(z, 0xff);
     
-    *buf++ = COMPOSABLE_RAW_RUN | cw[(p >> 7) & 1];
-    *buf++ = (8 - 3) | cw[(p >> 6) & 1];
-    *buf++ = cw[(p >> 5) & 1] | (cw[(p >> 4) & 1] << 16);
-    *buf++ = cw[(p >> 3) & 1] | (cw[(p >> 2) & 1] << 16);
-    *buf++ = cw[(p >> 1) & 1] | (cw[(p >> 0) & 1] << 16);
+    *buf++ = COMPOSABLE_RAW_RUN | cs[(p >> 7) & 1];
+    *buf++ = (16 - 3) | cs[(p >> 6) & 1];
+    *buf++ = bbcw[(p >> 4) & 3];
+    *buf++ = bbcw[(p >> 2) & 3];
+    *buf++ = bbcw[p & 3];
     
     ch = ch >> 16;
     z = ((ch >> 8) ^ ((ch >> 9) & m)) & 1; 
     p = charFont[((ch & 0xff) << 3) + yb] ^ __mul_instruction(z, 0xff);
     
-    *buf++ = COMPOSABLE_RAW_RUN | cw[(p >> 7) & 1];
-    *buf++ = (8 - 3) | cw[(p >> 6) & 1];
-    *buf++ = cw[(p >> 5) & 1] | (cw[(p >> 4) & 1] << 16);
-    *buf++ = cw[(p >> 3) & 1] | (cw[(p >> 2) & 1] << 16);
-    *buf++ = cw[(p >> 1) & 1] | (cw[(p >> 0) & 1] << 16);
+    *buf++ = bbcw[(p >> 6) & 3];
+    *buf++ = bbcw[(p >> 4) & 3];
+    *buf++ = bbcw[(p >> 2) & 3];
+    *buf++ = bbcw[p & 3];
   }
 
   // end with a black pixel
