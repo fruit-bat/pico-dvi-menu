@@ -19,19 +19,23 @@ static uint32_t bbcw[4] {
   fgc | (fgc << 16)
 };
 
+static uint32_t cw[2] {
+  bgc,
+  fgc
+};
+
+static uint32_t cs[2] {
+  bgc << 16,
+  fgc << 16
+};
+
 void __not_in_flash_func(pcw_prepare_scanvideo_scanline_80)(
     struct scanvideo_scanline_buffer *scanline_buffer, 
     int y,
     uint32_t frames)
 {
   uint32_t* buf = scanline_buffer->data;
-  
-  
-  uint32_t cw[2], cs[2];
-  cw[0] = bgc;
-  cw[1] = fgc;
-  cs[0] = cw[0] << 16;
-  cs[1] = cw[1] << 16;
+
   
   const uint16_t m = (frames >> 5) & 1;
 
