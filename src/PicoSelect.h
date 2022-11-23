@@ -8,14 +8,14 @@ class PicoSelect : public PicoWin {
 
 private:
   std::vector<PicoOption *> _options;
-  std::function<void(PicoOption *option)> _toggle;
+  std::function<void(PicoOption *option, int32_t i)> _toggle;
 
   int32_t _i, _r, _rh;
   bool _quickKeys;
 
   void paintRow(PicoPen *pen, bool focused, int32_t i);
   int32_t optionCount() { return (int32_t)_options.size(); }
-  void toggleSelection(PicoOption *option);
+  void toggleSelection(int32_t i);
   
 public:
 
@@ -25,7 +25,7 @@ public:
   void clearOptions();
   void deleteOptions();
   void enableQuickKeys() { _quickKeys = true; }
-  void onToggle(std::function<void(PicoOption *option)> toggle) { _toggle = toggle; }
+  void onToggle(std::function<void(PicoOption *option, int32_t i)> toggle) { _toggle = toggle; }
   void focus(int32_t i);
   int32_t focus() { return _i; };
 };
