@@ -16,6 +16,7 @@ set(pico_menu_common
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoQuickKeyAscii.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoWiz.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoTextField.cpp
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoExplorer.cpp
 )
 
 add_library(pico_dvi_menu INTERFACE)
