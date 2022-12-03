@@ -1,6 +1,5 @@
 #include "PicoExplorer.h"
 #include "PicoPen.h"
-// #include <pico/printf.h>
 
 PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
   PicoWin(x, y, w, r * rh),
@@ -77,7 +76,7 @@ void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
   FILINFO finfo;
   const char *fname = _cache->read(&finfo) ? finfo.fname : "??????????????????";
   pen->printAtF(0, 0, false, "%c   %s", (focused ? '>' : ' '), fname);
-  for(int32_t i = strlen(fname) + 5; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
+  for(int32_t i = strlen(fname) + 4; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
 void PicoExplorer::toggleSelection(int32_t i) {
@@ -88,7 +87,6 @@ void PicoExplorer::toggleSelection(int32_t i) {
       _toggle(&finfo, i);
     }
   }
-  repaint();
 }
 
 void PicoExplorer::focus(int32_t i) {
