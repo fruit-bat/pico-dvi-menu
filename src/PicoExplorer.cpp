@@ -76,9 +76,8 @@ void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
   _cache->seek(i);
   FILINFO finfo;
   const char *fname = _cache->read(&finfo) ? finfo.fname : "??????????????????";
-  
-  // TODO write complete row
-  pen->printAtF(0, 0, false, "%c   %s     ", (focused ? '>' : ' '), fname);
+  pen->printAtF(0, 0, false, "%c   %s", (focused ? '>' : ' '), fname);
+  for(int32_t i = strlen(fname) + 5; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
 void PicoExplorer::toggleSelection(int32_t i) {
