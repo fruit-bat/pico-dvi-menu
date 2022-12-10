@@ -72,18 +72,16 @@ PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w
 }
 
 void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
-  _cache->seek(i);
   FILINFO finfo;
-  const char *fname = _cache->read(&finfo) ? finfo.fname : "??????????????????";
+  const char *fname = _cache->read(i, &finfo) ? finfo.fname : "????????.???";
   pen->printAtF(0, 0, false, "%c   %s", (focused ? '>' : ' '), fname);
   for(int32_t i = strlen(fname) + 4; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
 void PicoExplorer::toggleSelection(int32_t i) {
   if (_toggle) { 
-    _cache->seek(i);
     FILINFO finfo;
-    if (_cache->read(&finfo)) {
+    if (_cache->read(i, &finfo)) {
       _toggle(&finfo, i);
     }
   }
