@@ -16,31 +16,27 @@ PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w
         return false;
       }
       case 129: {
-        if (_i > _r) { 
-          _i -= _r;
-          repaint();
-        }
+        _i -= _r;
+        while (_i < 0) _i += optionCount();
+        repaint();
         return false;
       }
       case 128: {
-        if (_i + _r < optionCount()) {
-          _i += r;
-          repaint();
-        }
+        _i += r;
+        while (_i >= optionCount()) _i -= optionCount();
+        repaint();
         return false;
       }
       case 131: {
-        if (_i > 0) { 
-          --_i;
-          repaint();
-        }
+        --_i;
+        while (_i < 0) _i += optionCount();
+        repaint();
         return false;
       }
       case 130: {
-        if (_i + 1 < optionCount()) {
-          ++_i;
-          repaint();
-        }
+        ++_i;
+        while (_i >= optionCount()) _i -= optionCount();
+        repaint();
         return false;
       }
     }
@@ -74,7 +70,7 @@ PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w
 void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
   FILINFO finfo;
   const char *fname = _cache->read(i, &finfo) ? finfo.fname : "????????.???";
-  pen->printAtF(0, 0, false, "%c   %s", (focused ? '>' : ' '), fname);
+  pen->printAtF(0, 0, false, "%c %c %s", (focused ? '>' : ' '), (finfo.fattrib & AM_DIR ? '*' : ' '), fname);
   for(int32_t i = strlen(fname) + 4; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
@@ -82,7 +78,12 @@ void PicoExplorer::toggleSelection(int32_t i) {
   if (_toggle) { 
     FILINFO finfo;
     if (_cache->read(i, &finfo)) {
-      _toggle(&finfo, i);
+      if (finfo.fattrib & AM_DIR) {
+        // TODO open the folder
+      }
+      else {
+        _toggle(&finfo, i);
+      }
     }
   }
 }
