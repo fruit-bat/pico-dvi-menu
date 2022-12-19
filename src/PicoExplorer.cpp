@@ -1,6 +1,14 @@
 #include "PicoExplorer.h"
 #include "PicoPen.h"
 
+#define DEBUG_PICO_EXPLORER
+
+#ifdef DEBUG_PICO_EXPLORER
+#define DBG_PRINTF(...) printf(__VA_ARGS__)
+#else
+#define DBG_PRINTF(...)
+#endif
+
 PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
   PicoWin(x, y, w, r * rh),
   _cache(cache),
@@ -75,16 +83,18 @@ void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
 }
 
 void PicoExplorer::toggleSelection(int32_t i) {
-  if (_toggle) { 
-    FILINFO finfo;
-    if (_cache->read(i, &finfo)) {
-      if (finfo.fattrib & AM_DIR) {
-        // TODO open the folder
-      }
-      else {
-        _toggle(&finfo, i);
-      }
-    }
+  FILINFO finfo;
+  if (_cache->read(i, &finfo)) {
+    toggleSelection(i, &finfo);
+  }
+}
+
+void PicoExplorer::toggleSelection(int32_t i, FILINFO* finfo) {
+  if (finfo->fattrib & AM_DIR) {
+    // TODO open the folder
+  }
+  else {
+    if (_toggle) _toggle(finfo, i);
   }
 }
 
@@ -99,3 +109,30 @@ void PicoExplorer::focus(int32_t i) {
   repaint();
 }
 
+void PicoExplorer::next(std::function<bool(FILINFO *info)> filter, int d) {
+  if (_i < 0 || optionCount() < 1) return;
+  if (d > 1) d = 1;
+  if (d < -1) d = -1;
+  int32_t j = _i + d;
+  do {
+    if (j >= optionCount()) j -= optionCount();
+    if (j < 0) j += optionCount();
+    FILINFO finfo;
+    if (!_cache->read(j, &finfo)) {
+      DBG_PRINTF("PicoExplorer: failed to read directory entry for position %ld\n", j);
+      return;
+    }
+    if (filter(&finfo)) {
+      DBG_PRINTF("PicoExplorer: toggling next entry at position %ld, '%s'\n", j, finfo.fname);
+      _i = j;
+      toggleSelection(j, &finfo);
+      repaint();
+      return;
+    }
+    if (d == 0) {
+      d = 1;
+    }
+    j += d;
+  }
+  while (j != _i);
+}
