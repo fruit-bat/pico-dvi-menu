@@ -9,14 +9,43 @@
 #define DBG_PRINTF(...)
 #endif
 
-PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
+PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
   PicoWin(x, y, w, r * rh),
-  _cache(cache),
+  _cache(sdCard),
+  _path(root),
   _i(0), _r(r), _rh(rh)
 {
+  _cache.filter([] (const char *fname) bool {
+    return fname[0] != '.';
+  });
+  load();
+  
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
     
+    DBG_PRINTF("PicoExplorer: key press keycode %2.2X, modifiers %2.2X, ascii %2.2X\n", keycode, modifiers, ascii);
+
+    switch(keycode) {
+      case 0x4b: {
+        pageUp();
+        return false;
+      }
+      case 0x4e: {
+        pageDown();
+        return false;
+      }
+      default:
+        break;      
+    }
+
     switch(ascii) {
+      case 27: {
+        if (_path.size()) {
+          _path.pop();
+          load();
+          return false;
+        }
+        break;
+      }
       case 32: case 13: {
         if (_i >= 0 && _i < optionCount()) {
           toggleSelection(_i);
@@ -24,15 +53,11 @@ PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w
         return false;
       }
       case 129: {
-        _i -= _r;
-        while (_i < 0) _i += optionCount();
-        repaint();
+        pageUp();
         return false;
       }
       case 128: {
-        _i += r;
-        while (_i >= optionCount()) _i -= optionCount();
-        repaint();
+        pageDown();
         return false;
       }
       case 131: {
@@ -47,6 +72,8 @@ PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w
         repaint();
         return false;
       }
+      default:
+        break;
     }
     
     return true;
@@ -75,23 +102,36 @@ PicoExplorer::PicoExplorer(FatFsDirCache* cache, int32_t x, int32_t y, int32_t w
   onClear([=](PicoPen *pen) {});
 }
 
+void PicoExplorer::pageDown() {
+  _i += _r;
+  while (_i >= optionCount()) _i -= optionCount();
+  repaint();
+}
+
+void PicoExplorer::pageUp() {
+  _i -= _r;
+  while (_i < 0) _i += optionCount();
+  repaint();
+}
+
 void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
   FILINFO finfo;
-  const char *fname = _cache->read(i, &finfo) ? finfo.fname : "????????.???";
+  const char *fname = _cache.read(i, &finfo) ? finfo.fname : "????????.???";
   pen->printAtF(0, 0, false, "%c %c %s", (focused ? '>' : ' '), (finfo.fattrib & AM_DIR ? '*' : ' '), fname);
   for(int32_t i = strlen(fname) + 4; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
 void PicoExplorer::toggleSelection(int32_t i) {
   FILINFO finfo;
-  if (_cache->read(i, &finfo)) {
+  if (_cache.read(i, &finfo)) {
     toggleSelection(i, &finfo);
   }
 }
 
 void PicoExplorer::toggleSelection(int32_t i, FILINFO* finfo) {
   if (finfo->fattrib & AM_DIR) {
-    // TODO open the folder
+    _path.push(finfo->fname);
+    load();
   }
   else {
     if (_toggle) _toggle(finfo, i);
@@ -118,7 +158,7 @@ void PicoExplorer::next(std::function<bool(FILINFO *info)> filter, int d) {
     if (j >= optionCount()) j -= optionCount();
     if (j < 0) j += optionCount();
     FILINFO finfo;
-    if (!_cache->read(j, &finfo)) {
+    if (!_cache.read(j, &finfo)) {
       DBG_PRINTF("PicoExplorer: failed to read directory entry for position %ld\n", j);
       return;
     }
@@ -136,3 +176,18 @@ void PicoExplorer::next(std::function<bool(FILINFO *info)> filter, int d) {
   }
   while (j != _i);
 }
+
+void PicoExplorer::load() {
+  _i = 0;
+  _cache.attach(&_path);
+  _cache.load();
+  repaint();
+}
+
+void PicoExplorer::reload() {
+  _i = 0;
+  _cache.attach(&_path);
+  _cache.reload();
+  repaint();
+}
+
