@@ -11,6 +11,7 @@
 
 PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
   PicoWin(x, y, w, r * rh),
+  _sdCard(sdCard),
   _cache(sdCard),
   _path(root),
   _i(0), _r(r), _rh(rh)
@@ -38,6 +39,25 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
     }
 
     switch(ascii) {
+      // 1=DEL 2=REN 3=CPY 4=PST 5=REF
+      case 0x31: { // 1 - Delete
+        action(_i, onDeleteFile);
+        return false;
+      }
+      case 0x32: { // 2 - Rename
+        action(_i, onRenameFile);
+        return false;
+      }
+      case 0x33: { // 3 - Copy
+        return false;
+      }
+      case 0x34: { // 4 - Paste
+        return false;
+      }
+      case 0x35: { // 5 - Refresh
+        if (onRefresh) onRefresh(); else reload();
+        return false;
+      }
       case 27: {
         if (_path.size()) {
           _path.pop();
@@ -121,6 +141,15 @@ void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
   for(int32_t i = strlen(fname) + 4; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
+void PicoExplorer::action(int32_t i, std::function<void(FILINFO *info, int32_t i)> func) {
+  if (func) {
+    FILINFO finfo;
+    if (_cache.read(i, &finfo)) {
+      func(&finfo, i);
+    }
+  }
+}
+
 void PicoExplorer::toggleSelection(int32_t i) {
   FILINFO finfo;
   if (_cache.read(i, &finfo)) {
@@ -134,7 +163,10 @@ void PicoExplorer::toggleSelection(int32_t i, FILINFO* finfo) {
     load();
   }
   else {
-    if (_toggle) _toggle(finfo, i);
+    std::string fullpath;
+    FatFsFilePath path(&_path, finfo->fname);
+    path.appendTo(fullpath);
+    if (onToggle) onToggle(finfo, i, fullpath.c_str());
   }
 }
 
@@ -190,4 +222,61 @@ void PicoExplorer::reload() {
   _cache.reload();
   repaint();
 }
+
+bool PicoExplorer::checkExists(const char *file) {
+  if (!_sdCard->mounted()) {
+    if (!_sdCard->mount()) return false;
+  }
+
+  std::string fullpath;
+  FatFsFilePath path(&_path, file);
+  path.appendTo(fullpath);
+
+  DBG_PRINTF("PicoExplorer: Checking '%s' exists\n", fullpath.c_str());
+
+  FILINFO fno;
+  FRESULT fr = f_stat(fullpath.c_str(), &fno);
+  return fr == FR_OK;
+}
+
+bool PicoExplorer::deleteFile(const char *file) {
+  if (!_sdCard->mounted()) {
+    if (!_sdCard->mount()) return false;
+  }
+  
+  std::string fullpath;
+  FatFsFilePath path(&_path, file);
+  path.appendTo(fullpath);
+
+  DBG_PRINTF("PicoExplorer: Deleting '%s' exists\n", fullpath.c_str());
+
+  bool r = f_unlink(fullpath.c_str()) == FR_OK;
+  
+  reload();
+  
+  return r;
+}
+
+bool PicoExplorer::renameFile(const char *fileo, const char *filen) {
+  if (!_sdCard->mounted()) {
+    if (!_sdCard->mount()) return false;
+  }
+  
+  std::string fullpatho;
+  FatFsFilePath patho(&_path, fileo);
+  patho.appendTo(fullpatho);
+
+  std::string fullpathn;
+  FatFsFilePath pathn(&_path, filen);
+  pathn.appendTo(fullpathn);
+  
+  DBG_PRINTF("PicoExplorer: Renaming '%s' to '%s'\n", fullpatho.c_str(), fullpathn.c_str());
+  
+  bool r = f_rename(fullpatho.c_str(), fullpathn.c_str()) == FR_OK;
+
+  reload();
+  
+  return r;  
+}
+
 

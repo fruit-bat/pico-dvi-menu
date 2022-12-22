@@ -10,11 +10,10 @@
 class PicoExplorer : public PicoWin {
 
 private:
+  SdCardFatFsSpi* _sdCard;
   FatFsDirCache _cache;
   FatFsFilePath _path;
   
-  std::function<void(FILINFO *info, int32_t i)> _toggle;
-
   int32_t _i, _r, _rh;
 
   void paintRow(PicoPen *pen, bool focused, int32_t i);
@@ -24,13 +23,21 @@ private:
   void pageDown();
   void pageUp();
   void load();
+  void action(int32_t i, std::function<void(FILINFO *info, int32_t i)> func);
   
 public:
 
   PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh);
-  void onToggle(std::function<void(FILINFO *info, int32_t i)> toggle) { _toggle = toggle; }
   void focus(int32_t i);
   int32_t focus() { return _i; };
   void next(std::function<bool(FILINFO *info)> filter, int d);
   void reload();
+  bool checkExists(const char *file);
+  bool deleteFile(const char *file);
+  bool renameFile(const char *fileo, const char *filen);
+  
+  std::function<void(FILINFO *info, int32_t i, const char* path)> onToggle;
+  std::function<void(FILINFO *info, int32_t i)> onRenameFile;
+  std::function<void(FILINFO *info, int32_t i)> onDeleteFile;
+  std::function<void()> onRefresh;
 };
