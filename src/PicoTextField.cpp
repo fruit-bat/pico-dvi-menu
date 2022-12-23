@@ -110,3 +110,13 @@ void PicoTextField::clear() {
   _cursor = 0;
   _start = 0;
 }
+
+void PicoTextField::set(const char *text) { 
+  _text = text;
+  _cursor = textlen();
+  const int32_t e = (_cursor - _start) - ww() + 1;
+  if (e > 0) {
+    _start += e;
+  }
+  repaint();  
+}

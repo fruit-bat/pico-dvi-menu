@@ -1,5 +1,7 @@
 #include "PicoExplorer.h"
 #include "PicoPen.h"
+#include "FatFsSpiOutputStream.h"
+#include "FatFsSpiInputStream.h"
 
 #define DEBUG_PICO_EXPLORER
 
@@ -49,9 +51,11 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         return false;
       }
       case 0x33: { // 3 - Copy
+        action(_i, [&](FILINFO *finfo, int32_t i) { copy(finfo, i); });
         return false;
       }
       case 0x34: { // 4 - Paste
+        onPasteFile(_copiedName.c_str());
         return false;
       }
       case 0x35: { // 5 - Refresh
@@ -120,6 +124,31 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
   });
   
   onClear([=](PicoPen *pen) {});
+}
+
+void PicoExplorer::copy(FILINFO *finfo, int32_t i) {
+  _copiedPath.clear();
+  _copiedName = finfo->fname;
+  FatFsFilePath path(&_path, finfo->fname);
+  path.appendTo(_copiedPath);
+}
+
+bool PicoExplorer::pasteFile(const char *file) {
+  std::string topath;
+  FatFsFilePath path(&_path, file);
+  path.appendTo(topath);
+  FatFsSpiOutputStream os(_sdCard, topath.c_str());
+  FatFsSpiInputStream is(_sdCard, _copiedPath.c_str());
+  if (os.closed() || is.closed()) return false;
+  uint8_t buf[64];
+  int l = 0;
+  while(true) {
+    l = is.read(buf, sizeof(buf));
+    if (l < 0) break;
+    os.write(buf, l);
+  }
+  if (onRefresh) onRefresh(); else reload();
+  return l == -1;
 }
 
 void PicoExplorer::pageDown() {
