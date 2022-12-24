@@ -258,9 +258,10 @@ bool PicoExplorer::checkExists(const char *file) {
   }
 
   std::string fullpath;
-  FatFsFilePath path(&_path, file);
-  path.appendTo(fullpath);
-
+  {
+    FatFsFilePath path(&_path, file);
+    path.appendTo(fullpath);
+  }
   DBG_PRINTF("PicoExplorer: Checking '%s' exists\n", fullpath.c_str());
 
   FILINFO fno;
@@ -274,9 +275,10 @@ bool PicoExplorer::deleteFile(const char *file) {
   }
   
   std::string fullpath;
-  FatFsFilePath path(&_path, file);
-  path.appendTo(fullpath);
-
+  {
+    FatFsFilePath path(&_path, file);
+    path.appendTo(fullpath);
+  }
   DBG_PRINTF("PicoExplorer: Deleting '%s' exists\n", fullpath.c_str());
 
   bool r = f_unlink(fullpath.c_str()) == FR_OK;
@@ -292,12 +294,15 @@ bool PicoExplorer::renameFile(const char *fileo, const char *filen) {
   }
   
   std::string fullpatho;
-  FatFsFilePath patho(&_path, fileo);
-  patho.appendTo(fullpatho);
-
+  {
+    FatFsFilePath patho(&_path, fileo);
+    patho.appendTo(fullpatho);
+  }
   std::string fullpathn;
-  FatFsFilePath pathn(&_path, filen);
-  pathn.appendTo(fullpathn);
+  {
+    FatFsFilePath pathn(&_path, filen);
+    pathn.appendTo(fullpathn);
+  }
   
   DBG_PRINTF("PicoExplorer: Renaming '%s' to '%s'\n", fullpatho.c_str(), fullpathn.c_str());
   
