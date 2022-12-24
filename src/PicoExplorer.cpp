@@ -308,4 +308,18 @@ bool PicoExplorer::renameFile(const char *fileo, const char *filen) {
   return r;  
 }
 
+bool PicoExplorer::folderModified(const char *folder) {
+  if (_path.equals(folder)) {
+    DBG_PRINTF("PicoExplorer: Reloading modified folder '%s'\n", folder);
+    reload();
+    return true;
+  }
+  else {
+    std::string cp(folder);
+    cp.append("/.dcache");
+    DBG_PRINTF("PicoExplorer: Removing cache from modified folder '%s'\n", cp.c_str());
+    return FR_OK == f_unlink(cp.c_str());
+  }
+}
+
 

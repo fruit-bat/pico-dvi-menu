@@ -40,6 +40,7 @@ public:
   bool deleteFile(const char *file);
   bool renameFile(const char *fileo, const char *filen);
   bool pasteFile(const char *file);
+  bool folderModified(const char *folder);
   
   std::function<void(FILINFO *info, int32_t i, const char* path)> onToggle;
   std::function<void(FILINFO *info, int32_t i)> onRenameFile;
