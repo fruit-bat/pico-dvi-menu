@@ -3,7 +3,7 @@
 #include "FatFsSpiOutputStream.h"
 #include "FatFsSpiInputStream.h"
 
-#define DEBUG_PICO_EXPLORER
+// #define DEBUG_PICO_EXPLORER
 
 #ifdef DEBUG_PICO_EXPLORER
 #define DBG_PRINTF(...) printf(__VA_ARGS__)
