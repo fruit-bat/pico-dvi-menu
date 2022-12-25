@@ -15,5 +15,5 @@ public:
   int32_t textlen() { return (int32_t)_text.size(); }
   void clear();
   void onenter(std::function<void(const char *)> onenter) { _onenter = onenter; }
-
+  void set(const char *text);
 };

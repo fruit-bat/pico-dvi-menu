@@ -103,6 +103,9 @@ static uint8_t const keycode2ascii[128][2] =  {
     {'9'   , 0      }, /* 0x61 */ 
     {'0'   , 0      }, /* 0x62 */ 
     {'0'   , 0      }, /* 0x63 */ 
+    {0     , 0      }, /* 0x64 */ 
+    {0     , 0      }, /* 0x65 */ 
+    {0     , 0      }, /* 0x66 */ 
     {'='   , '='    }, /* 0x67 */ 
 };
 
@@ -127,7 +130,8 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
   
   int r = 0;
   for(unsigned int i = 0; i < 6; ++i) {
-    const unsigned char hidKeyCode = report->keycode[i];
+    const unsigned keycode = report->keycode[i];
+    const unsigned char hidKeyCode = keycode <= 0x67 ? report->keycode[i] : 0;
     if (hidKeyCode) {
       const bool isInPrev = isInReport(prev_report, hidKeyCode);
       
