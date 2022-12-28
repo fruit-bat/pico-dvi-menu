@@ -241,8 +241,12 @@ void PicoExplorer::next(std::function<bool(FILINFO *info)> filter, int d) {
 void PicoExplorer::load() {
   _i = 0;
   _cache.attach(&_path);
-  _cache.load();
-  repaint();
+  if (_cache.open()) {
+    repaint();    
+  }
+  else {
+    if (onRefresh) onRefresh(); else reload();
+  }
 }
 
 void PicoExplorer::reload() {

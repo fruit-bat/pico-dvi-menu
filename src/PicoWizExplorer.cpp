@@ -101,7 +101,7 @@ void PicoWizExplorer::wizDeleteFile(FILINFO *finfo, int32_t i) {
 
 void PicoWizExplorer::wizRefreshFolder() {
   _utils->showMessage([=](PicoPen *pen) {
-    pen->printAtF(0, 0, false, "Scanning folder");
+    pen->printAtF(0, 0, false, "Scanning folder...");
   });
   if (onRefreshDisplay) onRefreshDisplay();
   reload();
