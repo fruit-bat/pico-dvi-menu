@@ -9,9 +9,10 @@
 #include "FatFsFilePath.h"
 
 class PicoExplorer : public PicoWin {
+protected:
+  SdCardFatFsSpi* _sdCard;
 
 private:
-  SdCardFatFsSpi* _sdCard;
   FatFsDirCache _cache;
   FatFsFilePath _path; 
   int32_t _i, _r, _rh;
@@ -41,6 +42,7 @@ public:
   bool renameFile(const char *fileo, const char *filen);
   bool pasteFile(const char *file);
   bool folderModified(const char *folder);
+  SdCardFatFsSpi* sdCard() { return _sdCard; }
   
   std::function<void(FILINFO *info, int32_t i, const char* path)> onToggle;
   std::function<void(FILINFO *info, int32_t i)> onRenameFile;

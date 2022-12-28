@@ -15,6 +15,8 @@ set(pico_menu_common
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoQuickKey.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoQuickKeyAscii.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoWiz.cpp
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoWizUtils.cpp
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoWizExplorer.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoTextField.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoExplorer.cpp
 )
