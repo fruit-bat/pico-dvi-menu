@@ -18,7 +18,7 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
   _path(root),
   _i(0), _r(r), _rh(rh)
 {
-  _cache.filter([] (const char *fname) bool {
+  _cache.filter([] (const char *fname) {
     return fname[0] != '.';
   });
   load();
