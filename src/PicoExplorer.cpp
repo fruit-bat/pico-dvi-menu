@@ -62,7 +62,9 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         if (onRefresh) onRefresh(); else reload();
         return false;
       }
-      case 27: {
+      case 27:  // Escape
+      case 129: // Left
+      {
         if (_path.size()) {
           _path.pop();
           load();
@@ -70,27 +72,24 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         }
         break;
       }
-      case 32: case 13: {
+      case 32:  // Space
+      case 13:  // Enter
+      case 128: // Right
+      {
         if (_i >= 0 && _i < optionCount()) {
           toggleSelection(_i);
         }
         return false;
       }
-      case 129: {
-        pageUp();
-        return false;
-      }
-      case 128: {
-        pageDown();
-        return false;
-      }
-      case 131: {
+      case 131: // Up
+      {
         --_i;
         while (_i < 0) _i += optionCount();
         repaint();
         return false;
       }
-      case 130: {
+      case 130: // Down
+      {
         ++_i;
         while (_i >= optionCount()) _i -= optionCount();
         repaint();

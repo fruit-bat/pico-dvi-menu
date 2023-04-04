@@ -24,36 +24,43 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
         }
       }
     }
-    
-    switch(ascii) {
-      case 32: case 13: {
-        if (_i >= 0 && _i < optionCount()) {
-          toggleSelection(_i);
-        }
-        return false;
-      }
-      case 129: {
+
+    switch(keycode) {
+      case HID_KEY_PAGE_UP: { // Page up
         if (_i > _r) { 
           _i -= _r;
           repaint();
         }
         return false;
       }
-      case 128: {
+      case HID_KEY_PAGE_DOWN: { // Page Down
         if (_i + _r < optionCount()) {
           _i += r;
           repaint();
         }
         return false;
       }
-      case 131: {
+      default: break;
+    }
+    
+    switch(ascii) {
+      case 32:  // Space
+      case 13:  // Enter
+      case 128: // Right
+      { // Select
+        if (_i >= 0 && _i < optionCount()) {
+          toggleSelection(_i);
+        }
+        return false;
+      }
+      case 131: { // Up
         if (_i > 0) { 
           --_i;
           repaint();
         }
         return false;
       }
-      case 130: {
+      case 130: { // Down
         if (_i + 1 < optionCount()) {
           ++_i;
           repaint();

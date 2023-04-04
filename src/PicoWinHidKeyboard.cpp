@@ -153,7 +153,8 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
             (_capslock && (hidKeyCode >= 0x04) && (hidKeyCode <= 0x1d)) || 
             (report->modifier & (KEYBOARD_MODIFIER_LEFTSHIFT | KEYBOARD_MODIFIER_RIGHTSHIFT));
           uint8_t ch = keycode2ascii[report->keycode[i]][is_shift ? 1 : 0];
-          if (keyPressed(hidKeyCode, report->modifier, ch) && (ch == 27)) r = 1;
+          // Escape or Left to exit
+          if (keyPressed(hidKeyCode, report->modifier, ch) && (ch == 27 || ch == 129)) r = 1;
         }
       }
     }
