@@ -1,5 +1,5 @@
 #include "PicoCharRenderer.h"
-#include "PicoFontCushion.h"
+#include <cstring>
 
 extern "C" {
 #include "dvi.h"
@@ -7,10 +7,6 @@ extern "C" {
 #include "common_dvi_pin_configs.h"
 #include "tmds_encode.h"
 }
-
-__attribute__((aligned(4))) static uint16_t charScreen[PCS_COLS * PCS_ROWS];
-static uint8_t charFont[256 * 8];
-static PicoCharScreen picoCharScreen(charScreen, PCS_COLS, PCS_ROWS);
 
 uint pcw_prepare_scanline_80(struct dvi_inst *dvi0, const uint y, const uint ys, const uint frames) {
   static uint32_t scanbuf32[(PCS_COLS + 3) >> 2];
@@ -36,12 +32,4 @@ uint pcw_prepare_scanline_80(struct dvi_inst *dvi0, const uint y, const uint ys,
 #endif
   queue_add_blocking(&dvi0->q_tmds_valid, &tmdsbuf);
   return PCS_COLS;
-}
-
-void pcw_init_renderer() {
-  memcpy(&charFont[32*8], PicoFontCushion, sizeof(PicoFontCushion));
-}
-
-PicoCharScreen *pcw_screen() {
-  return &picoCharScreen;
 }

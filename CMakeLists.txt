@@ -19,6 +19,7 @@ set(pico_menu_common
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoWizExplorer.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoTextField.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoExplorer.cpp
+	${CMAKE_CURRENT_LIST_DIR}/src/PicoStaticScreen.cpp
 )
 
 add_library(pico_dvi_menu INTERFACE)

@@ -3,10 +3,6 @@
 #include "pico/scanvideo.h"
 #include "pico/scanvideo/composable_scanline.h"
 
-__attribute__((aligned(4))) static uint16_t charScreen[PCS_COLS * PCS_ROWS];
-static uint8_t charFont[256 * 8]; // TODO too big ?
-static PicoCharScreen picoCharScreen(charScreen, PCS_COLS, PCS_ROWS);
-
 #define VGA_RGB_555(r,g,b) ((r##UL<<0)|(g##UL<<6)|(b##UL << 11))
 
 static uint32_t bgc = 0;
@@ -71,19 +67,4 @@ void __not_in_flash_func(pcw_prepare_scanvideo_scanline_80)(
 
   scanline_buffer->data_used = buf - scanline_buffer->data;
   scanline_buffer->status = SCANLINE_OK;  
-}
-
-void pcw_init_renderer() {
-  memcpy(&charFont[32*8], PicoFontCushion, sizeof(PicoFontCushion));
-    
-  for (int x = 0; x < PCS_COLS; ++x) {
-    for (int y = 0; y < PCS_ROWS; ++y) {
-      int i = x + (y * PCS_COLS);
-      charScreen[i] = 32;
-    }
-  }
-}
-
-PicoCharScreen *pcw_screen() {
-  return &picoCharScreen;
 }

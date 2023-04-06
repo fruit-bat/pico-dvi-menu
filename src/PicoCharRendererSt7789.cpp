@@ -1,10 +1,4 @@
 #include "PicoCharRendererSt7789.h"
-#include "PicoFontCushion.h"
-
-
-__attribute__((aligned(4))) static uint16_t charScreen[PCS_COLS * PCS_ROWS];
-static uint8_t charFont[256 * 8]; // TODO too big ?
-static PicoCharScreen picoCharScreen(charScreen, PCS_COLS, PCS_ROWS);
 
 static uint32_t colour_words[4] = {
   0x00000000,
@@ -79,20 +73,4 @@ void __not_in_flash_func(pcw_send_st7789_frame)(
   uint32_t frame
 ) {
   for (uint32_t y = 0; y < 240; ++y) pcw_send_st7789_scanline(pio, sm, y, frame);
-}
-
-
-void pcw_init_renderer() {
-  memcpy(&charFont[32*8], PicoFontCushion, sizeof(PicoFontCushion));
-  
-  for (int x = 0; x < PCS_COLS; ++x) {
-    for (int y = 0; y < PCS_ROWS; ++y) {
-      int i = x + (y * PCS_COLS);
-      charScreen[i] = 3;
-    }
-  }
-}
-
-PicoCharScreen *pcw_screen() {
-  return &picoCharScreen;
 }
