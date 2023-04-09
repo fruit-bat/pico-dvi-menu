@@ -15,7 +15,7 @@ void __not_in_flash_func(pcw_prepare_st7789_scanline)(uint32_t* buf, int y, uint
   // Assume even number of character columns.
   // charScreen must be 32bit word aligned.
   uint32_t *cl = (uint32_t *)(charScreen + li);
-  for (int x = 0; x < (PCS_COLS >> 1); ++x) {
+  for (int x = 0; x < (LCD_COLS >> 1); ++x) {
     uint32_t ch = *cl++;
     uint16_t z;
     int b;
@@ -47,7 +47,7 @@ void __not_in_flash_func(pcw_send_st7789_scanline)(PIO pio, uint sm, int y, uint
   // Assume even number of character columns.
   // charScreen must be 32bit word aligned.
   uint32_t *cl = (uint32_t *)(charScreen + li);
-  for (int x = 0; x < (PCS_COLS >> 1); ++x) {
+  for (int x = 0; x < (LCD_COLS >> 1); ++x) {
     uint32_t ch = *cl++;
     uint16_t z;
     int b;

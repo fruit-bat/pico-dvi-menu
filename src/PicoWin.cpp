@@ -104,3 +104,12 @@ bool PicoWin::bubbleKeyPress(uint8_t keycode, uint8_t modifiers, uint8_t ascii) 
 bool PicoWin::keyPressed(uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
   return _focus ? _focus->keyPressed(keycode, modifiers, ascii) : bubbleKeyPress(keycode, modifiers, ascii);
 }
+  
+void PicoWin::move(int32_t x, int32_t y, int32_t w, int32_t h) {
+  _rect._x = x;
+  _rect._y = y;
+  _rect._w = w;
+  _rect._h = h;
+  if (_parent) _parent->repaint(); 
+  else repaint();
+}

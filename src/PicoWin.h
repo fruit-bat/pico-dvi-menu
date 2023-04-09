@@ -48,4 +48,5 @@ public:
   void onPaint(std::function<void(PicoPen *pen)> paint) { _paint = paint; }
   void onClear(std::function<void(PicoPen *pen)> clear) { _clear = clear; }
   void onKeydown(std::function<bool(uint8_t keycode, uint8_t modifiers, uint8_t ascii)> onkeydown) { _onkeydown = onkeydown; };
+  void move(int32_t x, int32_t y, int32_t w, int32_t h);
 };
