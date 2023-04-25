@@ -8,7 +8,7 @@ PicoSlider::PicoSlider(
   _step(step),
   _steps(w)
 {
-  for (uint32_t i = 0; i < _step * _steps; ++i) _chars.append(" ");
+  for (uint32_t i = 0; i < _steps; ++i) _chars.append(" ");
   
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
     if (keycode == 0x4e || ascii == 131) { // Up
