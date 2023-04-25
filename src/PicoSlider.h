@@ -9,7 +9,7 @@ class PicoSlider : public PicoWin {
   std::function<uint32_t()> _get;
   uint32_t _step;
   uint32_t _steps;
-  char *_chars;
+  std::string _chars;
 
 public:
   PicoSlider(int32_t x, int32_t y, int32_t w, uint32_t step);
