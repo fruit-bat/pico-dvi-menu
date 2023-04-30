@@ -15,6 +15,18 @@ public:
     _chars[x +(y * _rect._w)] = c;
   }
 
+  inline uint32_t frameWidthPixels() {
+    return _rect.w() << 3;
+  }
+
+  inline uint32_t frameHeightPixels() {
+    return _rect.h() << 3;
+  }
+
+  inline uint16_t *chars() {
+    return _chars;
+  }
+
   void clear();
 
   PicoRectXYWH *rect() { return &_rect; } 

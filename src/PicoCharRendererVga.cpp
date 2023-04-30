@@ -1,10 +1,5 @@
 #include "PicoCharRendererVga.h"
-#include "PicoFontCushion.h"
 
-
-__attribute__((aligned(4))) static uint16_t charScreen[PCS_COLS * PCS_ROWS];
-static uint8_t charFont[256 * 8]; // TODO too big ?
-static PicoCharScreen picoCharScreen(charScreen, PCS_COLS, PCS_ROWS);
 static uint32_t nibblebits[16];
 
 void __not_in_flash_func(pcw_prepare_vga332_scanline_80)(uint32_t* buf, int y, uint32_t frames) {
@@ -31,9 +26,7 @@ void __not_in_flash_func(pcw_prepare_vga332_scanline_80)(uint32_t* buf, int y, u
   }
 }
 
-void pcw_init_renderer() {
-  memcpy(&charFont[32*8], PicoFontCushion, sizeof(PicoFontCushion));
-  
+void pcw_init_vga332_renderer() { 
   for(int i = 0; i < 16; ++i) {
     uint32_t a = 0;
     for(int j = 0; j < 4; ++j) {
@@ -41,15 +34,4 @@ void pcw_init_renderer() {
     }
     nibblebits[i] = a;
   }
-  
-  for (int x = 0; x < PCS_COLS; ++x) {
-    for (int y = 0; y < PCS_ROWS; ++y) {
-      int i = x + (y * PCS_COLS);
-      charScreen[i] = 32;
-    }
-  }
-}
-
-PicoCharScreen *pcw_screen() {
-  return &picoCharScreen;
 }
