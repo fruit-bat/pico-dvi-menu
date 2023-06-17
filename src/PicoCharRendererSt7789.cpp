@@ -1,10 +1,25 @@
 #include "PicoCharRendererSt7789.h"
 
+#ifdef INVERSE_LCD
+#define LCD_COL(c) (0xf-c##UL)
+#else
+#define LCD_COL(c) (c##UL)
+#endif
+#define LCD_RGB_444_POS(r,g,b) ((r<<8)|(g<<4)|b)
+#define LCD_RGB_444(r,g,b) LCD_RGB_444_POS(LCD_COL(r),LCD_COL(g), LCD_COL(b))
+#define LCD_BG LCD_RGB_444(0x0,0x0,0x0)
+#define LCD_FG LCD_RGB_444(0xf,0xf,0xf)
+#define LCD_WORD(a,b) ((a << 8) | (b << 20))
+#define LCD_CW0 LCD_WORD(LCD_BG, LCD_BG)
+#define LCD_CW1 LCD_WORD(LCD_FG, LCD_BG)
+#define LCD_CW2 LCD_WORD(LCD_BG, LCD_FG)
+#define LCD_CW3 LCD_WORD(LCD_FG, LCD_FG)
+
 static uint32_t colour_words[4] = {
-  0x00000000,
-  0x000fff00,
-  0xfff00000,
-  0xffffff00,
+  LCD_CW0,
+  LCD_CW1,
+  LCD_CW2,
+  LCD_CW3
 };
 
 void __not_in_flash_func(pcw_prepare_st7789_scanline)(uint32_t* buf, int y, uint32_t frames) {
