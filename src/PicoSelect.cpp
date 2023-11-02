@@ -44,7 +44,7 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
     }
     
     switch(ascii) {
-      case 32:  // Space
+      //case 32:  // Space - Don't use by default - upsets the membrane keyboard layout
       case 13:  // Enter
       case 128: // Right
       { // Select

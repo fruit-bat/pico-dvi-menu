@@ -72,7 +72,7 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         }
         break;
       }
-      case 32:  // Space
+      // case 32:  // Space - Don't use by default - upsets the membrane keyboard layout
       case 13:  // Enter
       case 128: // Right
       {
