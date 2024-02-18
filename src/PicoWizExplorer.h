@@ -15,6 +15,8 @@ private:
   void wizDeleteFile(FILINFO *finfo, int32_t i);
   void wizPasteFile(const char* name);
   void wizRefreshFolder();
+  void wizSaveFile();
+  void wizSaveFile(const char* name);
 
 public:
   PicoWizExplorer(
@@ -31,4 +33,5 @@ public:
   ~PicoWizExplorer() {}
   
   std::function<void()> onRefreshDisplay;  
+  std::function<bool(FatFsSpiOutputStream *os)> onWizSaveFile;  
 };

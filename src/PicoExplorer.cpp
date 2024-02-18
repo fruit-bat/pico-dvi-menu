@@ -62,6 +62,10 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         if (onRefresh) onRefresh(); else reload();
         return false;
       }
+      case 0x36: { // 6 - Save
+        if (onSaveFile) onSaveFile();
+        return false;
+      }
       case 27:  // Escape
       case 129: // Left
       {
@@ -132,22 +136,30 @@ void PicoExplorer::copy(FILINFO *finfo, int32_t i) {
   path.appendTo(_copiedPath);
 }
 
-bool PicoExplorer::pasteFile(const char *file) {
+bool PicoExplorer::saveFile(const char *file, std::function<bool(FatFsSpiOutputStream *os)> write) {
   std::string topath;
   FatFsFilePath path(&_path, file);
   path.appendTo(topath);
   FatFsSpiOutputStream os(_sdCard, topath.c_str());
-  FatFsSpiInputStream is(_sdCard, _copiedPath.c_str());
-  if (os.closed() || is.closed()) return false;
-  uint8_t buf[64];
-  int l = 0;
-  while(true) {
-    l = is.read(buf, sizeof(buf));
-    if (l < 0) break;
-    os.write(buf, l);
-  }
+  if (os.closed()) return false;
+  const bool r = write(&os);
   if (onRefresh) onRefresh(); else reload();
-  return l == -1;
+  return r;
+}
+
+bool PicoExplorer::pasteFile(const char *file) {
+  FatFsSpiInputStream is(_sdCard, _copiedPath.c_str());
+  if (is.closed()) return false;
+  return saveFile(file, [&](FatFsSpiOutputStream *os){
+    uint8_t buf[64];
+    int l = 0;
+    while(true) {
+      l = is.read(buf, sizeof(buf));
+      if (l < 0) break;
+      os->write(buf, l);
+    }
+    return l == -1;
+  });
 }
 
 void PicoExplorer::pageDown() {

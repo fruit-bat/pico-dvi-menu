@@ -41,12 +41,14 @@ public:
   bool deleteFile(const char *file);
   bool renameFile(const char *fileo, const char *filen);
   bool pasteFile(const char *file);
+  bool saveFile(const char *file, std::function<bool(FatFsSpiOutputStream *os)> write);
   bool folderModified(const char *folder);
   SdCardFatFsSpi* sdCard() { return _sdCard; }
   
   std::function<void(FILINFO *info, int32_t i, const char* path)> onToggle;
   std::function<void(FILINFO *info, int32_t i)> onRenameFile;
   std::function<void(FILINFO *info, int32_t i)> onDeleteFile;
+  std::function<void()> onSaveFile;
   std::function<void(const char *name)> onPasteFile;
   std::function<void()> onRefresh;
 };

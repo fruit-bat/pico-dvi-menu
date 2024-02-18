@@ -29,6 +29,53 @@ PicoWizExplorer::PicoWizExplorer(
   onRefresh = [&]() {
     wizRefreshFolder();
   };
+
+  onSaveFile = [&]() {
+    wizSaveFile();
+  };
+}
+
+void PicoWizExplorer::wizSaveFile(const char* name) {
+  if(saveFile(
+    name, 
+    [&](FatFsSpiOutputStream *os){
+      return onWizSaveFile && onWizSaveFile(os);
+    })
+  ) {
+    _utils->removeMessage();
+  }
+  else {
+    _utils->showError([=](PicoPen *pen) {
+      pen->printAtF(0, 0, false, "Failed to save '%s'", name);
+    });
+  }
+}
+
+void PicoWizExplorer::wizSaveFile() {
+  _fileName.onenter([=](const char* name) {
+    _tmpName = name;
+    if (checkExists(name)) {
+      _utils->confirm(
+        [=](PicoPen *pen){
+          pen->printAtF(0, 0, false, "Overwrite '%s'?", _tmpName.c_str());
+        },
+        [=]() {
+          wizSaveFile(_tmpName.c_str());
+        }
+      );
+    }
+    else {
+      wizSaveFile(_tmpName.c_str());
+    }
+  });
+  if (onWizSaveFile) {
+    _utils->wiz()->push(
+      &_fileName, 
+      [=](PicoPen *pen){ 
+        pen->printAtF(0, 0, false, "Enter a save name"); 
+      },
+      true);
+  }
 }
 
 void PicoWizExplorer::wizRenameFile(FILINFO *finfo, int32_t i) {
