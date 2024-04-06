@@ -33,3 +33,24 @@ uint pcw_prepare_scanline_80(struct dvi_inst *dvi0, const uint y, const uint ys,
   queue_add_blocking(&dvi0->q_tmds_valid, &tmdsbuf);
   return PCS_COLS;
 }
+
+uint pcw_prepare_blankline_80(struct dvi_inst *dvi0, const uint frames) {
+  static uint32_t scanbuf32[(PCS_COLS + 3) >> 2];
+  uint8_t *scanbuf = (uint8_t *)&scanbuf32;
+  for (uint i = 0; i < PCS_COLS; ++i) {
+    const uint8_t cf = 0;
+    scanbuf[i] = cf ;
+  }
+  uint32_t *tmdsbuf;
+  queue_remove_blocking(&dvi0->q_tmds_free, &tmdsbuf);
+  tmds_encode_1bpp(scanbuf32, tmdsbuf, PCS_FRAME_WIDTH);
+#if !DVI_MONOCHROME_TMDS
+  uint16_t *p = (uint16_t *)tmdsbuf;
+  memcpy(p + PCS_FRAME_WIDTH, p, PCS_FRAME_WIDTH << 1);
+  p+= PCS_FRAME_WIDTH;
+  memcpy(p + PCS_FRAME_WIDTH, p, PCS_FRAME_WIDTH << 1);
+#endif
+  queue_add_blocking(&dvi0->q_tmds_valid, &tmdsbuf);
+  return PCS_COLS;
+}
+
