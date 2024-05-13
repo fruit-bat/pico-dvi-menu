@@ -29,7 +29,8 @@ private:
   void load();
   void action(int32_t i, std::function<void(FILINFO *info, int32_t i)> func);
   void copy(FILINFO *finfo, int32_t i);
-  
+  int32_t nextMatch(const int32_t s, const char c);
+
 public:
 
   PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh);

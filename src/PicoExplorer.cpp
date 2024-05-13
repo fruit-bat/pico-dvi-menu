@@ -103,6 +103,15 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         break;
     }
     
+    if ((ascii >= 32) && (ascii < 0x7e)) {
+      const int32_t i = nextMatch(_i, ascii);
+      if (i >= 0) {
+        _i = i;
+        repaint();
+        return false;
+      }
+    }
+
     return true;
   });
   
@@ -172,6 +181,22 @@ void PicoExplorer::pageUp() {
   _i -= _r;
   while (_i < 0) _i += optionCount();
   repaint();
+}
+
+int32_t PicoExplorer::nextMatch(const int32_t s, const char c) {
+  if ((optionCount() == 0) || (s >= optionCount())) return -1;
+  FILINFO finfo;
+  int32_t i = s;
+  const char l = tolower(c);
+  while(true) {
+    if (++i >= optionCount()) i -= optionCount();
+    if (i == s) return -1;
+    if (!_cache.read(i, &finfo)) return -1;
+    const char u = finfo.fname[0];
+    if (u > 0) {
+      if (tolower(u) == l) return i;
+    }
+  }
 }
 
 void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
