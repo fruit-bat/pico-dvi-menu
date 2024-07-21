@@ -26,7 +26,6 @@ private:
   void toggleSelection(int32_t i, FILINFO* finfo);
   void pageDown();
   void pageUp();
-  void load();
   void action(int32_t i, std::function<void(FILINFO *info, int32_t i)> func);
   void copy(FILINFO *finfo, int32_t i);
   int32_t nextMatch(const int32_t s, const char c);
@@ -34,6 +33,10 @@ private:
 public:
 
   PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh);
+
+  // Call this after construction but before first use
+  void load();
+
   void focus(int32_t i);
   int32_t focus() { return _i; };
   void next(std::function<bool(FILINFO *info)> filter, int d);

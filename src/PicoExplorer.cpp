@@ -21,7 +21,6 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
   _cache.filter([] (const char *fname) {
     return fname[0] != '.';
   });
-  load();
   
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
     
