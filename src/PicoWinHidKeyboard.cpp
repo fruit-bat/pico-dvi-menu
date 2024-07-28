@@ -162,3 +162,31 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 
   return r;
 }
+
+// 000FUDLR   Kempston joystick
+#define KEMPSTON_RIGHT 0x01
+#define KEMPSTON_LEFT  0x02
+#define KEMPSTON_DOWN  0x04
+#define KEMPSTON_UP    0x08
+#define KEMPSTON_FIRE  0x10
+#define KEMPSTON_DIR   0x0F
+
+#define ASCII_RIGHT    128  //Enter/Right
+#define ASCII_LEFT     129  //Escape/Left
+#define ASCII_DOWN     130
+#define ASCII_UP       131
+
+
+int PicoWinHidKeyboard::processJoystick(uint8_t value,uint8_t old_value) {
+  int r = 0;
+
+  if (value& KEMPSTON_DIR) {
+    if (value&KEMPSTON_RIGHT)  if (!(old_value&KEMPSTON_RIGHT))  keyPressed(0, 0, ASCII_RIGHT);
+    if (value&KEMPSTON_LEFT)  if (!(old_value&KEMPSTON_LEFT))  keyPressed(0, 0, ASCII_LEFT);
+    if (value&KEMPSTON_UP)  if (!(old_value&KEMPSTON_UP))  keyPressed(0, 0, ASCII_UP);
+    if (value&KEMPSTON_DOWN)  if (!(old_value&KEMPSTON_DOWN))  keyPressed(0, 0, ASCII_DOWN);
+  }
+
+
+  return r;
+}

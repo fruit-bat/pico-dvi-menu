@@ -12,6 +12,5 @@ public:
   PicoWinHidKeyboard(PicoDisplay *display);
 
   int processHidReport(hid_keyboard_report_t const *report, hid_keyboard_report_t const *prev_report);
-  int processJoystick(uint8_t joystick_value);
-
+  int processJoystick(uint8_t value,uint8_t old_value) 
 };
