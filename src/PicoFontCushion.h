@@ -549,8 +549,8 @@ static const unsigned char PicoFontCushion[768] = {
   0x30, //    @@    
   0x30, //    @@    
   0x30, //    @@    
-  0x30, //    @@    
-  0x3c, //    @@@@  
+  0x3c, //    @@@@    
+  0x00, //      
 
   0x60, //   @@    
   0x60, //   @@    
@@ -559,7 +559,7 @@ static const unsigned char PicoFontCushion[768] = {
   0x18, //     @@  
   0x18, //     @@  
   0x0c, //      @@  
-  0x0c, //      @@  
+  0x00, //        
 
   0x3c, //    @@@@  
   0x0c, //      @@  
@@ -567,8 +567,8 @@ static const unsigned char PicoFontCushion[768] = {
   0x0c, //      @@  
   0x0c, //      @@  
   0x0c, //      @@  
-  0x0c, //      @@  
   0x3c, //    @@@@  
+  0x00, //       
 
   0x18, //     @@  
   0x3c, //    @@@@  
