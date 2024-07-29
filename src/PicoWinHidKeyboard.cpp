@@ -174,7 +174,7 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 #define JOYSTICK_BT0   0x80
 #define JOYSTICK_FIRE  0x80
 #define JOYSTICK_DIR   0x0F
-#define JOYSTICK_WANT   (JOYSTICK_DIR|JOYSTICK_BT3)
+#define JOYSTICK_WANT   (JOYSTICK_DIR|JOYSTICK_BT0)
 
 
 #define ASCII_RIGHT    128  //Enter/Right
@@ -191,7 +191,7 @@ int PicoWinHidKeyboard::processJoystick(uint8_t value) {
     if (value&JOYSTICK_LEFT)  if (!(old_value&JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
     if (value&JOYSTICK_UP)  if (!(old_value&JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
     if (value&JOYSTICK_DOWN)  if (!(old_value&JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
-    if (value&JOYSTICK_BT3)  if (!(old_value&JOYSTICK_BT3))  r = 1; //Escape from Menu   
+    if (value&JOYSTICK_BT0)  if (!(old_value&JOYSTICK_BT0))  r = 1; //Fire to escape from Menu   
   }
   old_value=value;
 
