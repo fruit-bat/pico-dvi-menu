@@ -163,7 +163,7 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
   return r;
 }
 
-// 000FUDLR   Kempston joystick
+// F321UDLR  joystick
 #define JOYSTICK_RIGHT 0x01
 #define JOYSTICK_LEFT  0x02
 #define JOYSTICK_DOWN  0x04
@@ -187,6 +187,6 @@ int PicoWinHidKeyboard::processJoystick(uint8_t value) {
     if (value&JOYSTICK_DOWN)  if (!(old_value&JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
   }
   old_value=value;
-   
+
   return r;
 }
