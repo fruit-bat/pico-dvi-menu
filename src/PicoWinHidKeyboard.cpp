@@ -162,3 +162,38 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 
   return r;
 }
+
+// F321UDLR  joystick
+#define JOYSTICK_RIGHT 0x01
+#define JOYSTICK_LEFT  0x02
+#define JOYSTICK_DOWN  0x04
+#define JOYSTICK_UP    0x08
+#define JOYSTICK_BT1   0x10
+#define JOYSTICK_BT2   0x20
+#define JOYSTICK_BT3   0x40
+#define JOYSTICK_BT0   0x80
+#define JOYSTICK_FIRE  0x80
+#define JOYSTICK_DIR   0x0F
+#define JOYSTICK_WANT   (JOYSTICK_DIR|JOYSTICK_BT0)
+
+
+#define ASCII_RIGHT    128  //Enter/Right
+#define ASCII_LEFT     129  //Escape/Left
+#define ASCII_DOWN     130
+#define ASCII_UP       131
+
+
+int PicoWinHidKeyboard::processJoystick(uint8_t value) {
+  int r = 0;
+
+  if (value& JOYSTICK_WANT) {
+    if (value&JOYSTICK_RIGHT)  if (!(old_value&JOYSTICK_RIGHT))  keyPressed(0, 0, ASCII_RIGHT);
+    if (value&JOYSTICK_LEFT)  if (!(old_value&JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
+    if (value&JOYSTICK_UP)  if (!(old_value&JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
+    if (value&JOYSTICK_DOWN)  if (!(old_value&JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
+    if (value&JOYSTICK_BT0)  if (!(old_value&JOYSTICK_BT0))  r = 1; //Fire to escape from Menu   
+  }
+  old_value=value;
+
+  return r;
+}
