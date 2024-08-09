@@ -25,7 +25,9 @@ PicoOnScreenKeyboard::PicoOnScreenKeyboard(
     if (_x>=9) _x=0; else _x++;
         repaint();
         return false;
-    } else  if (ascii==27) { //Esc aka Button 3 - joystick
+    } else if (keycode==0x29) { //Keyboard ESC
+        return true;
+    } else  if (ascii==27) { //Esc aka Button 3 - joystick 
          if (!Line[_y][_x].EscapeChar) {
            const ZxSpectrumKeyContact * k = &Line[_y][_x].contact;
            _press(k->line,k->key);
