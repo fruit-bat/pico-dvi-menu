@@ -181,7 +181,7 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 #define ASCII_LEFT     129  //Escape/Left
 #define ASCII_DOWN     130
 #define ASCII_UP       131
-
+#define ASCII_ESC       27  //Escape
 
 int PicoWinHidKeyboard::processJoystick(uint8_t value) {
   int r = 0;
@@ -191,7 +191,10 @@ int PicoWinHidKeyboard::processJoystick(uint8_t value) {
     if (value&JOYSTICK_LEFT)  if (!(old_value&JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
     if (value&JOYSTICK_UP)  if (!(old_value&JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
     if (value&JOYSTICK_DOWN)  if (!(old_value&JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
-    if (value&JOYSTICK_BT3)  if (!(old_value&JOYSTICK_BT3))  r = 1; //Button 4 to escape from Menu   
+    if (value&JOYSTICK_BT3)  if (!(old_value&JOYSTICK_BT3)) {
+      keyPressed(0, 0, ASCII_ESC);
+       r = 1; //Button 4 to escape from Menu   
+    }
   }
   old_value=value;
   return r;
