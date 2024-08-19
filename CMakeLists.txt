@@ -21,7 +21,6 @@ set(pico_menu_common
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoExplorer.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoStaticScreen.cpp
 	${CMAKE_CURRENT_LIST_DIR}/src/PicoSlider.cpp
-	${CMAKE_CURRENT_LIST_DIR}/src/PicoOnScreenKeyboard.cpp
 )
 
 add_library(pico_dvi_menu INTERFACE)
