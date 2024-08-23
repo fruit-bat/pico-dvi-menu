@@ -58,11 +58,19 @@ PicoSelect::PicoSelect(int32_t x, int32_t y, int32_t w, int32_t r, int32_t rh) :
           --_i;
           repaint();
         }
+        else if (optionCount() > 1) {
+          _i = optionCount() - 1;
+          repaint();
+        }
         return false;
       }
       case 130: { // Down
         if (_i + 1 < optionCount()) {
           ++_i;
+          repaint();
+        }
+        else if (optionCount() > 1) {
+          _i = 0;
           repaint();
         }
         return false;
