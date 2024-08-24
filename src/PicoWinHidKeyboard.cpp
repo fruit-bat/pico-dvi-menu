@@ -174,8 +174,6 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 #define JOYSTICK_BT0   0x80
 #define JOYSTICK_FIRE  0x80
 #define JOYSTICK_DIR   0x0F
-#define JOYSTICK_WANT   (JOYSTICK_DIR|JOYSTICK_BT3)
-
 
 #define ASCII_RIGHT    128  //Enter/Right
 #define ASCII_LEFT     129  //Escape/Left
@@ -183,26 +181,37 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 #define ASCII_UP       131
 #define ASCII_ESC       27  //Escape
 
-int PicoWinHidKeyboard::processJoystick(uint8_t value) {
-  int r = 0;
+// Button 2 & 4 enter to Menu
+#define MENU_BUTTON_MASK (JOYSTICK_BT3 | JOYSTICK_BT1)
 
-  if (value& JOYSTICK_WANT) {
-    if (value&JOYSTICK_RIGHT)  if (!(old_value&JOYSTICK_RIGHT))  keyPressed(0, 0, ASCII_RIGHT);
-    if (value&JOYSTICK_LEFT)  if (!(old_value&JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
-    if (value&JOYSTICK_UP)  if (!(old_value&JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
-    if (value&JOYSTICK_DOWN)  if (!(old_value&JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
-    if (value&JOYSTICK_BT3)  if (!(old_value&JOYSTICK_BT3)) {
-      keyPressed(0, 0, ASCII_ESC);
-       r = 1; //Button 4 to escape from Menu   
-    }
+
+inline bool is_button_pressed(const uint8_t value, const uint8_t old_value, const u_int8_t mask) {
+  return ((value & mask) == mask) && !((old_value & mask) == mask);
+}
+
+inline bool is_menu_button_pressed(const uint8_t value, const uint8_t old_value) {
+  return is_button_pressed(value, old_value, MENU_BUTTON_MASK);
+}
+
+int PicoWinHidKeyboard::processJoystick(uint8_t value) {
+  const int r = is_menu_button_pressed(value, old_value) ? 1 : 0;
+
+  if (!r) {
+    if (is_button_pressed(value, old_value, JOYSTICK_RIGHT))  keyPressed(0, 0, ASCII_RIGHT);
+    if (is_button_pressed(value, old_value, JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
+    if (is_button_pressed(value, old_value, JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
+    if (is_button_pressed(value, old_value, JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
   }
-  old_value=value;
+  else {
+      keyPressed(0, 0, ASCII_ESC);
+  }
+
+  old_value = value;
   return r;
 }
 
 int PicoWinHidKeyboard::processJoystickMenuEnter(uint8_t value) {
-  int r = 0;
-  if (value&JOYSTICK_BT3) if (!(old_value&JOYSTICK_BT3)) r = 1; //Button 4 enter to Menu   
-  old_value=value;
+  const int r = is_menu_button_pressed(value, old_value) ? 1 : 0;
+  old_value = value;
   return r;
 }
