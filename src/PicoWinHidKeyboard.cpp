@@ -193,14 +193,33 @@ inline bool is_menu_button_pressed(const uint8_t value, const uint8_t old_value)
   return is_button_pressed(value, old_value, MENU_BUTTON_MASK);
 }
 
+void PicoWinHidKeyboard::handleJoystickPress(const uint8_t value, const uint8_t old_value) {
+  if (is_button_pressed(value, old_value, JOYSTICK_RIGHT))  keyPressed(0, 0, ASCII_RIGHT);
+  if (is_button_pressed(value, old_value, JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
+  if (is_button_pressed(value, old_value, JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
+  if (is_button_pressed(value, old_value, JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
+}
+
+#define REPEAT_START_DELAY_US 700000
+#define REPEAT_AGAIN_DELAY_US 200000
+
 int PicoWinHidKeyboard::processJoystick(uint8_t value) {
+
   const int r = is_menu_button_pressed(value, old_value) ? 1 : 0;
 
   if (!r) {
-    if (is_button_pressed(value, old_value, JOYSTICK_RIGHT))  keyPressed(0, 0, ASCII_RIGHT);
-    if (is_button_pressed(value, old_value, JOYSTICK_LEFT))  keyPressed(0, 0, ASCII_LEFT);
-    if (is_button_pressed(value, old_value, JOYSTICK_UP))  keyPressed(0, 0, ASCII_UP);
-    if (is_button_pressed(value, old_value, JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
+    if (value && (value == old_value)) {
+      uint32_t t_us_now = time_us_64();
+      uint32_t t_us = t_us_now - repeat_timer;
+      if (t_us > REPEAT_START_DELAY_US) {
+        handleJoystickPress(value, 0);
+        repeat_timer += REPEAT_AGAIN_DELAY_US;
+      }
+    }
+    else {
+      repeat_timer = time_us_64();
+      handleJoystickPress(value, old_value);
+    }
   }
   else {
       keyPressed(0, 0, ASCII_ESC);
@@ -213,5 +232,8 @@ int PicoWinHidKeyboard::processJoystick(uint8_t value) {
 int PicoWinHidKeyboard::processJoystickMenuEnter(uint8_t value) {
   const int r = is_menu_button_pressed(value, old_value) ? 1 : 0;
   old_value = value;
+  if (r) {
+      repeat_timer = time_us_64();
+  }
   return r;
 }

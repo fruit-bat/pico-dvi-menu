@@ -7,8 +7,10 @@ private:
   PicoDisplay *_display;
   bool _capslock;
   uint8_t old_value=0;
+  uint32_t repeat_timer;
 
   bool keyPressed(uint8_t keycode, uint8_t modifiers, uint8_t ascii);
+  void handleJoystickPress(const uint8_t value, const uint8_t old_value);
 public:
   PicoWinHidKeyboard(PicoDisplay *display);
 
