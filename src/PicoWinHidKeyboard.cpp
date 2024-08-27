@@ -118,16 +118,46 @@ static bool isInReport(hid_keyboard_report_t const *report, const unsigned char 
 
 PicoWinHidKeyboard::PicoWinHidKeyboard(PicoDisplay *display) :
   _display(display),
-  _capslock(false)
+  _capslock(false),
+  curr_hidKeyCode(0),
+  curr_ascii(0)
 {
 }
 
 bool PicoWinHidKeyboard::keyPressed(uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
+  curr_hidKeyCode = keycode;
+  curr_modifiers = modifiers;
+  curr_ascii = ascii;
+  repeat_timer = time_us_64();
   return _display->keyPressed(keycode, modifiers, ascii);
 }
 
+#define REPEAT_START_DELAY_US 700000
+#define REPEAT_AGAIN_DELAY_US 200000
+
+void __not_in_flash_func(PicoWinHidKeyboard::processKeyRepeat)() {
+
+  if (curr_hidKeyCode || curr_ascii) 
+  {
+    const uint32_t t_us_now = time_us_64();
+    const uint32_t t_us = t_us_now - repeat_timer;
+    if (t_us > REPEAT_START_DELAY_US) {
+      _display->keyPressed(curr_hidKeyCode, curr_modifiers, curr_ascii);
+      repeat_timer += REPEAT_AGAIN_DELAY_US;
+    }
+  }
+}
+
+void PicoWinHidKeyboard::cancelRepeat() {
+    curr_hidKeyCode = 0;
+    curr_ascii = 0;
+}
+
 int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hid_keyboard_report_t const *prev_report) {
-  
+  if (memcmp(report,prev_report, sizeof(hid_keyboard_report_t))) {
+    cancelRepeat();
+  }
+
   int r = 0;
   for(unsigned int i = 0; i < 6; ++i) {
     const unsigned keycode = report->keycode[i];
@@ -200,24 +230,16 @@ void PicoWinHidKeyboard::handleJoystickPress(const uint8_t value, const uint8_t 
   if (is_button_pressed(value, old_value, JOYSTICK_DOWN))  keyPressed(0, 0, ASCII_DOWN);
 }
 
-#define REPEAT_START_DELAY_US 700000
-#define REPEAT_AGAIN_DELAY_US 200000
-
 int PicoWinHidKeyboard::processJoystick(uint8_t value) {
 
+  if (old_value != value) {
+    cancelRepeat();
+  }
+  
   const int r = is_menu_button_pressed(value, old_value) ? 1 : 0;
 
   if (!r) {
-    if (value && (value == old_value)) {
-      uint32_t t_us_now = time_us_64();
-      uint32_t t_us = t_us_now - repeat_timer;
-      if (t_us > REPEAT_START_DELAY_US) {
-        handleJoystickPress(value, 0);
-        repeat_timer += REPEAT_AGAIN_DELAY_US;
-      }
-    }
-    else {
-      repeat_timer = time_us_64();
+    if (value) {
       handleJoystickPress(value, old_value);
     }
   }
