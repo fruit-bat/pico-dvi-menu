@@ -6,7 +6,7 @@ class PicoWinHidKeyboard {
 private:
   PicoDisplay *_display;
   bool _capslock;
-  uint8_t old_value=0;
+  uint8_t old_value;
   uint32_t repeat_timer;
   unsigned char curr_hidKeyCode;
   uint8_t curr_modifiers;

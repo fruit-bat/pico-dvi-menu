@@ -119,6 +119,7 @@ static bool isInReport(hid_keyboard_report_t const *report, const unsigned char 
 PicoWinHidKeyboard::PicoWinHidKeyboard(PicoDisplay *display) :
   _display(display),
   _capslock(false),
+  old_value(0),
   curr_hidKeyCode(0),
   curr_ascii(0)
 {
