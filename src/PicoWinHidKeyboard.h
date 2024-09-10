@@ -14,7 +14,6 @@ private:
 
   bool keyPressed(uint8_t keycode, uint8_t modifiers, uint8_t ascii);
   void handleJoystickPress(const uint8_t value, const uint8_t old_value);
-  void cancelRepeat();
 public:
   PicoWinHidKeyboard(PicoDisplay *display);
 
@@ -22,4 +21,5 @@ public:
   int processJoystick(uint8_t value);
   int processJoystickMenuEnter(uint8_t value);
   void processKeyRepeat();
+  void cancelRepeat();
 };
