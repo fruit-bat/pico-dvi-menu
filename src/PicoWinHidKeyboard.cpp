@@ -216,7 +216,7 @@ int PicoWinHidKeyboard::processHidReport(hid_keyboard_report_t const *report, hi
 #define MENU_BUTTON_MASK (JOYSTICK_BT3 | JOYSTICK_BT1)
 
 
-inline bool is_button_pressed(const uint8_t value, const uint8_t old_value, const u_int8_t mask) {
+inline bool is_button_pressed(const uint8_t value, const uint8_t old_value, const uint8_t mask) {
   return ((value & mask) == mask) && !((old_value & mask) == mask);
 }
 
