@@ -29,6 +29,7 @@ private:
   void action(int32_t i, std::function<void(FILINFO *info, int32_t i)> func);
   void copy(FILINFO *finfo, int32_t i);
   int32_t nextMatch(const int32_t s, const char c);
+  static int32_t wrapIndex(int32_t i, int32_t count);
 
 public:
 

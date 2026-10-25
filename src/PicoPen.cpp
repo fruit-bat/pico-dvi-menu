@@ -19,6 +19,7 @@ void PicoPen::printAt(int32_t x, int32_t y, bool wrap, const char *str) {
     if (*str == '\n') {
       xc = 0;
       yc++;
+      str++;
     }
     else {
       set(xc++, yc, *str++);

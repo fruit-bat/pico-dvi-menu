@@ -11,6 +11,7 @@ PicoSlider::PicoSlider(
   for (uint32_t i = 0; i < _steps; ++i) _chars.append(" ");
   
   onKeydown([=](uint8_t keycode, uint8_t modifiers, uint8_t ascii) {
+    if (!_get || !_set) return true;
     if (keycode == 0x4e || ascii == 131) { // Up
         uint32_t v = _get();
         uint32_t m = (uint32_t)__mul_instruction(_step, _steps);

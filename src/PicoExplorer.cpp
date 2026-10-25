@@ -2,6 +2,7 @@
 #include "PicoPen.h"
 #include "FatFsSpiOutputStream.h"
 #include "FatFsSpiInputStream.h"
+#include <strings.h>
 
 // #define DEBUG_PICO_EXPLORER
 
@@ -54,7 +55,7 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
         return false;
       }
       case 0x34: { // 4 - Paste
-        onPasteFile(_copiedName.c_str());
+        if (onPasteFile) onPasteFile(_copiedName.c_str());
         return false;
       }
       case 0x35: { // 5 - Refresh
@@ -86,15 +87,13 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
       }
       case 131: // Up
       {
-        --_i;
-        while (_i < 0) _i += optionCount();
+        _i = wrapIndex(_i - 1, optionCount());
         repaint();
         return false;
       }
       case 130: // Down
       {
-        ++_i;
-        while (_i >= optionCount()) _i -= optionCount();
+        _i = wrapIndex(_i + 1, optionCount());
         repaint();
         return false;
       }
@@ -137,6 +136,13 @@ PicoExplorer::PicoExplorer(SdCardFatFsSpi* sdCard, FatFsFilePath* root, int32_t 
   onClear([=](PicoPen *pen) {});
 }
 
+// Wrap an index into the range [0, count), or 0 if there is nothing to select
+int32_t PicoExplorer::wrapIndex(int32_t i, int32_t count) {
+  if (count <= 0) return 0;
+  i %= count;
+  return i < 0 ? i + count : i;
+}
+
 void PicoExplorer::copy(FILINFO *finfo, int32_t i) {
   _copiedPath.clear();
   _copiedName = finfo->fname;
@@ -156,6 +162,11 @@ bool PicoExplorer::saveFile(const char *file, std::function<bool(FatFsSpiOutputS
 }
 
 bool PicoExplorer::pasteFile(const char *file) {
+  // Writing truncates the destination, so pasting a file over itself would destroy it
+  std::string topath;
+  FatFsFilePath path(&_path, file);
+  path.appendTo(topath);
+  if (strcasecmp(topath.c_str(), _copiedPath.c_str()) == 0) return false;
   FatFsSpiInputStream is(_sdCard, _copiedPath.c_str());
   if (is.closed()) return false;
   return saveFile(file, [&](FatFsSpiOutputStream *os){
@@ -171,14 +182,12 @@ bool PicoExplorer::pasteFile(const char *file) {
 }
 
 void PicoExplorer::pageDown() {
-  _i += _r;
-  while (_i >= optionCount()) _i -= optionCount();
+  _i = wrapIndex(_i + _r, optionCount());
   repaint();
 }
 
 void PicoExplorer::pageUp() {
-  _i -= _r;
-  while (_i < 0) _i += optionCount();
+  _i = wrapIndex(_i - _r, optionCount());
   repaint();
 }
 
@@ -200,8 +209,10 @@ int32_t PicoExplorer::nextMatch(const int32_t s, const char c) {
 
 void PicoExplorer::paintRow(PicoPen *pen, bool focused, int32_t i) {
   FILINFO finfo;
-  const char *fname = _cache.read(i, &finfo) ? finfo.fname : "????????.???";
-  pen->printAtF(0, 0, false, "%c %c %s", (focused ? '>' : ' '), (finfo.fattrib & AM_DIR ? '*' : ' '), fname);
+  const bool found = _cache.read(i, &finfo);
+  const char *fname = found ? finfo.fname : "????????.???";
+  const bool dir = found && (finfo.fattrib & AM_DIR);
+  pen->printAtF(0, 0, false, "%c %c %s", (focused ? '>' : ' '), (dir ? '*' : ' '), fname);
   for(int32_t i = strlen(fname) + 4; i < pen->cw(); ++i) pen->printAt(i, 0, false, " ");
 }
 
